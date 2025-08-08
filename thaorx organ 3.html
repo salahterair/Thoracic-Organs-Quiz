@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Thoracic Organs MCQ — UMST Faculty of Medicine</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#0b1020; --ink:#e5e7eb; --muted:#9ca3af;
+    --line:#1f2937; --accent:#22c55e; --danger:#ef4444; --brand:#d91f26;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(135deg,#0b1226,#0f172a);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  .wrap{max-width:980px;margin:0 auto;padding:18px}
+  /* Centered header with logo above */
+  header{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:12px;text-align:center}
+  header img{width:100px;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+  .uni{font-weight:800;font-size:18px;line-height:1.2}
+  .dept{color:var(--muted);font-size:14px}
+  .batch{color:#e9e9e9;font-weight:600}
+  .card{background:linear-gradient(180deg,#0b1020,#090f1a);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.25);padding:18px}
+  .title{font-weight:800;font-size:22px;margin:2px 0 10px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:var(--muted);font-size:12px}
+  .meter{height:10px;background:#0b0f1a;border:1px solid #23314a;border-radius:999px;overflow:hidden}
+  .meter>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#60a5fa,#22d3ee);transition:width .35s ease}
+  .qbox{margin-top:16px}
+  .q{font-weight:700;margin:2px 0 8px}
+  .options{display:grid;gap:10px;margin-top:8px}
+  label.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid #263243;background:#0b1020;border-radius:12px;padding:10px;cursor:pointer}
+  input[type=radio]{margin-top:4px}
+  .feedback{margin-top:10px;font-size:14px}
+  .good{color:var(--accent)}
+  .bad{color:var(--danger)}
+  .controls{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+  button{background:#1f2937;color:var(--ink);border:1px solid #2a394d;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+  button.primary{background:linear-gradient(180deg,#2563eb,#1d4ed8);border-color:#3b82f6}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .muted{color:var(--muted)}
+  .summary{margin-top:16px}
+  .kicker{color:#a7f3d0;font-weight:700}
+  .footer-note{margin-top:10px;color:var(--muted);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="logo.jpg" alt="UMST Logo" />
+    <div class="uni">University of Medical Sciences & Technology</div>
+    <div class="dept">Faculty of Medicine</div>
+    <div class="batch">Batch 30 & 28 – Abha Center</div>
+  </header>
+
+  <div class="card">
+    <div class="title">Thoracic Organs — MCQ Quiz</div>
+    <div class="meta">
+      <span class="pill">Batch 30 & 28 – Abha Center</span>
+      <span class="pill">Format: Clinical vignettes (simple)</span>
+      <span class="pill">Questions: <span id="total">0</span></span>
+      <span class="pill">Score: <b id="score">0</b></span>
+      <span class="pill">Q <b id="idx">0</b>/<b id="tidx">0</b></span>
+      <span class="pill" style="border-color:var(--accent); color:var(--accent);">Created by Dr. Salaheldin Terair</span>
+    </div>
+    <div class="meter"><span id="bar"></span></div>
+
+    <div id="mount" class="qbox"></div>
+
+    <div class="controls">
+      <button id="submitBtn" class="primary" disabled>Submit</button>
+      <button id="nextBtn" disabled>Next</button>
+      <button id="restartBtn">Restart</button>
+    </div>
+    <div class="footer-note">Tip: select an option, submit to see feedback, then go next.</div>
+  </div>
+</div>
+
+<script>
+/* -------------------- DATA -------------------- */
+/* Each question object:
+   q: text, options: ["A","B","C","D"], answer: index 0-3, explanation: text
+*/
+const QUESTIONS = [
+  { q: "A patient presents with retrosternal chest pain after swallowing. Which structure is most likely compressed by an enlarged left atrium?",
+    options: ["Esophagus","Trachea","Aorta","Thoracic duct"],
+    answer: 0,
+    explanation: "The left atrium lies anterior to the esophagus; enlargement can compress it and cause dysphagia."
+  },
+  { q: "A stab wound to the left 5th intercostal space just medial to the midclavicular line would most likely injure which cardiac chamber?",
+    options: ["Right atrium","Right ventricle","Left atrium","Left ventricle"],
+    answer: 3,
+    explanation: "At that surface location the apex (left ventricle) is most superficial."
+  },
+  { q: "Which structure passes through the diaphragm at the T8 vertebral level?",
+    options: ["Aorta","Esophagus","Inferior vena cava","Thoracic duct"],
+    answer: 2,
+    explanation: "The IVC pierces the central tendon at T8 (\"I 8\")."
+  },
+  { q: "A patient has hoarseness due to left recurrent laryngeal nerve compression. Which thoracic structure is most likely enlarged?",
+    options: ["Ascending aorta","Pulmonary trunk","Aortic arch","Left atrium"],
+    answer: 2,
+    explanation: "The left recurrent laryngeal nerve loops under the aortic arch near the ligamentum arteriosum."
+  },
+  { q: "On the ward, a supine patient aspirates. Which bronchopulmonary segment is most likely to be affected?",
+    options: ["Apical segment of upper lobe","Superior segment of lower lobe","Middle lobe","Lingula"],
+    answer: 1,
+    explanation: "In the supine position, material tends to enter the superior segment of lower lobes, particularly on the right."
+  },
+  { q: "The cardiac notch is a feature of which lung?",
+    options: ["Right upper lobe","Right lower lobe","Left upper lobe","Left lower lobe"],
+    answer: 2,
+    explanation: "It indents the anterior border of the left upper lobe."
+  },
+  { q: "Which structure occupies the middle mediastinum?",
+    options: ["Thymus","Heart (pericardium)","Descending thoracic aorta","Esophagus"],
+    answer: 1,
+    explanation: "The heart and pericardial sac form the contents of the middle mediastinum."
+  },
+  { q: "During subxiphoid pericardiocentesis, the needle passes through which structure to avoid lung injury?",
+    options: ["Fibrous pericardium","Costal pleura","Diaphragm","Central tendon"],
+    answer: 3,
+    explanation: "The approach traverses the central tendon of the diaphragm to reach the pericardial sac safely."
+  },
+  { q: "Which vein drains most of the posterior thoracic wall on the right side?",
+    options: ["Accessory hemiazygos vein","Hemiazygos vein","Azygos vein","Internal thoracic vein"],
+    answer: 2,
+    explanation: "The azygos receives right posterior intercostal veins and arches to the SVC."
+  },
+  { q: "A superior sulcus (Pancoast) tumor may compress which structure causing Horner’s syndrome?",
+    options: ["Phrenic nerve","Sympathetic chain","Vagus nerve","Brachial plexus"],
+    answer: 1,
+    explanation: "Disruption of the sympathetic chain leads to miosis, ptosis, and anhidrosis."
+  },
+  { q: "Which structure passes through the diaphragm at T10?",
+    options: ["Aorta","Esophagus","Inferior vena cava","Thoracic duct"],
+    answer: 1,
+    explanation: "Esophagus and vagal trunks pass at T10 (\"10 Eggs\")."
+  },
+  { q: "The oblique fissure of the right lung separates which lobes?",
+    options: ["Upper and middle","Middle and lower","Upper and lower","Upper, middle, and lower"],
+    answer: 1,
+    explanation: "On the right, the oblique fissure separates middle from lower lobes."
+  },
+  { q: "Which nerve runs anterior to the root of the lung?",
+    options: ["Phrenic nerve","Vagus nerve","Sympathetic chain","Intercostal nerve"],
+    answer: 0,
+    explanation: "Phrenic is anterior to the hilum; vagus passes posterior."
+  },
+  { q: "Which pericardial layer is adherent to the heart muscle (myocardium)?",
+    options: ["Fibrous pericardium","Parietal serous pericardium","Visceral serous pericardium","Endocardium"],
+    answer: 2,
+    explanation: "The visceral layer of serous pericardium = epicardium."
+  },
+  { q: "Which great vessel gives rise to the brachiocephalic trunk?",
+    options: ["Right subclavian artery","Aortic arch","Ascending aorta","Left common carotid artery"],
+    answer: 1,
+    explanation: "The brachiocephalic trunk is the first branch of the aortic arch."
+  },
+  { q: "Pain from the pericardium is commonly referred to which dermatomes?",
+    options: ["C3–C5","T1–T4","T5–T9","T10–T12"],
+    answer: 0,
+    explanation: "Phrenic nerve (C3–C5) supplies fibrous and parietal serous pericardium."
+  },
+  { q: "Which lung lobe contains the lingula?",
+    options: ["Right upper lobe","Right middle lobe","Left upper lobe","Left lower lobe"],
+    answer: 2,
+    explanation: "The lingula is a tongue-like projection of the left upper lobe."
+  },
+  { q: "At which vertebral level does the trachea typically bifurcate?",
+    options: ["T2","T4/T5","T6","T8"],
+    answer: 1,
+    explanation: "At the sternal angle plane (T4/T5)."
+  },
+  { q: "Which structure is most anterior at the right lung hilum?",
+    options: ["Pulmonary artery","Pulmonary veins","Bronchus","Bronchial artery"],
+    answer: 1,
+    explanation: "Pulmonary veins lie anterior and inferior in the hilum."
+  },
+  { q: "In which mediastinal compartment is the thymus found (especially in children)?",
+    options: ["Anterior","Middle","Posterior","Superior"],
+    answer: 0,
+    explanation: "The thymus lies in the anterior mediastinum behind the sternum."
+  },
+  { q: "Which coronary artery supplies most of the anterior interventricular septum?",
+    options: ["Right coronary artery","Left anterior descending (LAD)","Circumflex artery","Posterior interventricular artery"],
+    answer: 1,
+    explanation: "The LAD supplies the anterior 2/3 of the septum."
+  },
+  { q: "Which vein drains the anterior thoracic wall to the axillary vein?",
+    options: ["Internal thoracic vein","Cephalic vein","Lateral thoracic vein","Brachiocephalic vein"],
+    answer: 2,
+    explanation: "The lateral thoracic vein empties into the axillary vein."
+  },
+  { q: "Which nerve passes posterior to the root of the lung?",
+    options: ["Phrenic nerve","Vagus nerve","Intercostal nerve","Sympathetic chain"],
+    answer: 1,
+    explanation: "Vagus runs posterior to the hilum."
+  },
+  { q: "In pericardial tamponade, which clinical finding is most typical?",
+    options: ["Muffled heart sounds","Loud S1","Wide splitting of S2","Fixed splitting of S2"],
+    answer: 0,
+    explanation: "Fluid in the pericardial sac dampens heart sounds."
+  },
+  { q: "Which structures pass through the aortic hiatus at T12?",
+    options: ["Aorta, azygos vein, thoracic duct","Aorta, esophagus, vagus nerve","Aorta, hemiazygos vein, phrenic nerve","Aorta, azygos vein, sympathetic trunk"],
+    answer: 0,
+    explanation: "Aorta + thoracic duct + (usually) azygos vein traverse the T12 hiatus."
+  },
+  { q: "The pulmonary ligament is formed by which pleura?",
+    options: ["Visceral pleura","Parietal pleura","Mediastinal pleura","Diaphragmatic pleura"],
+    answer: 2,
+    explanation: "It is a fold of mediastinal pleura extending below the lung root."
+  },
+  { q: "Which pleural layer is most sensitive to pain?",
+    options: ["Visceral pleura","Parietal pleura","Costodiaphragmatic recess","Pulmonary ligament"],
+    answer: 1,
+    explanation: "Parietal pleura has somatic innervation (intercostal/phrenic) and is pain-sensitive."
+  },
+  { q: "Which main bronchus is wider, shorter, and more vertical?",
+    options: ["Right","Left","Both equal","Neither"],
+    answer: 0,
+    explanation: "Right main bronchus—hence aspiration risk is higher on the right."
+  },
+  { q: "A penetrating wound in the right 2nd intercostal space near the sternum risks injuring which artery?",
+    options: ["Internal thoracic artery","Anterior intercostal artery","Posterior intercostal artery","Pericardiacophrenic artery"],
+    answer: 0,
+    explanation: "The internal thoracic artery descends just lateral to the sternum behind the costal cartilages."
+  },
+  { q: "A catheter placed at the left venous angle could injure which lymphatic structure terminating there?",
+    options: ["Thoracic duct","Right lymphatic duct","External jugular vein","Internal carotid artery"],
+    answer: 0,
+    explanation: "The thoracic duct typically empties into the junction of the left subclavian and internal jugular veins."
+  }
+];
+
+/* -------------------- QUIZ ENGINE -------------------- */
+let idx = 0;               // 0-based question index
+let score = 0;             // +1 per correct
+let answered = false;
+
+const $mount = document.getElementById("mount");
+const $submit = document.getElementById("submitBtn");
+const $next = document.getElementById("nextBtn");
+const $restart = document.getElementById("restartBtn");
+const $score = document.getElementById("score");
+const $bar = document.getElementById("bar");
+const $idx = document.getElementById("idx");
+const $tidx = document.getElementById("tidx");
+const $total = document.getElementById("total");
+
+$total.textContent = QUESTIONS.length;
+$tidx.textContent = QUESTIONS.length;
+
+function renderQuestion() {
+  const q = QUESTIONS[idx];
+  $mount.innerHTML = `
+    <div class="q"><span class="pill" style="border-color:#334155">Q${idx+1}</span> ${q.q}</div>
+    <div class="options">
+      ${q.options.map((opt,i)=>`
+        <label class="opt">
+          <input type="radio" name="opt" value="${i}">
+          <div>${String.fromCharCode(65+i)}. ${opt}</div>
+        </label>
+      `).join("")}
+    </div>
+    <div id="fb" class="feedback muted"></div>
+  `;
+  $idx.textContent = idx+1;
+  answered = false;
+  $submit.disabled = true;
+  $next.disabled = true;
+
+  // enable submit when an option is chosen
+  [...$mount.querySelectorAll('input[type=radio]')].forEach(r=>{
+    r.addEventListener('change', ()=>{ $submit.disabled = false; });
+  });
+
+  updateMeter();
+}
+
+function updateMeter(){
+  const pct = Math.round(((idx) / QUESTIONS.length) * 100);
+  $bar.style.width = pct + "%";
+}
+
+$submit.addEventListener('click', ()=>{
+  if (answered) return;
+  const sel = $mount.querySelector('input[type=radio]:checked');
+  if (!sel) return;
+  answered = true;
+  const choice = Number(sel.value);
+  const q = QUESTIONS[idx];
+  const fb = document.getElementById('fb');
+
+  if (choice === q.answer) {
+    score += 1;
+    fb.innerHTML = `<span class="good">Correct.</span> ${q.explanation}`;
+  } else {
+    fb.innerHTML = `<span class="bad">Not quite.</span> ${q.explanation}`;
+  }
+  document.getElementById('score').textContent = score;
+  $next.disabled = false;
+  $submit.disabled = true;
+});
+
+$next.addEventListener('click', ()=>{
+  if (idx < QUESTIONS.length - 1) {
+    idx += 1;
+    renderQuestion();
+  } else {
+    finish();
+  }
+});
+
+$restart.addEventListener('click', ()=>{
+  idx = 0; score = 0;
+  document.getElementById('score').textContent = score;
+  renderQuestion();
+});
+
+function finish(){
+  $mount.innerHTML = `
+    <div class="summary">
+      <div class="kicker">Quiz Complete</div>
+      <p>You scored <b>${score}</b> / <b>${QUESTIONS.length}</b>.</p>
+      <p class="muted">Review: refresh the page or press <b>Restart</b> to try again.</p>
+    </div>
+  `;
+  $next.disabled = true;
+  $submit.disabled = true;
+  $bar.style.width = "100%";
+}
+
+/* init */
+renderQuestion();
+</script>
+</body>
+</html>
